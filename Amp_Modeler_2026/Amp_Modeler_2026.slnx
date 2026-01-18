@@ -10,4 +10,8 @@
     <Platform Solution="*|x86" Project="x86" />
     <Deploy />
   </Project>
+  <Project Path="AmpModeler.Core/AmpModeler.Core.csproj" />
+  <Project Path="AmpModeler.Audio.Abstractions/AmpModeler.Audio.Abstractions.csproj" />
+  <Project Path="AmpModeler.Engine/AmpModeler.Engine.csproj" />
+  <Project Path="AmpModeler.Tests/AmpModeler.Tests.csproj" />
 </Solution>
