@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Amp_Modeler_2026 (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Amp_Modeler_2026 (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
