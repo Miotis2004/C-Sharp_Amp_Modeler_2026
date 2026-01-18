@@ -1,201 +1,265 @@
-# C-Sharp_Amp_Modeler_2026
+# AmpModeler (C# Neural Amp Modeler)
 
-Alt-Neural Amp Modeler (C# / Standalone)
-Overview
+## Overview
 
-This project is a from-scratch neural amp modeling application built in C# as a standalone Windows application, with a long-term goal of supporting plugin formats (VST3/AU).
+**AmpModeler** is a from-scratch neural amp modeling application written in **C#**, designed as a standalone Windows application with a long-term path toward plugin formats (VST3/AU).
 
-The system is inspired by modern neural amp modeling approaches but does not use existing amp modeling frameworks. Instead, it implements its own real-time audio engine, DSP graph, capture workflow, and neural inference pipeline, while allowing the use of:
+The project intentionally avoids existing amp modeling frameworks (JUCE, NAM, etc.) and instead focuses on a clean, modular architecture that separates:
 
-A selectable audio I/O backend (WASAPI or ASIO)
+* Real-time audio hosting
+* DSP graph and signal processing
+* Neural inference
+* Capture and dataset generation
+* User interface
 
-A machine learning runtime (ONNX Runtime) for real-time inference
+The primary goals are **real-time stability**, **architectural clarity**, and **behavioral accuracy**, rather than rapid feature delivery.
 
-The project emphasizes real-time stability, extensibility, and architectural clarity over rapid feature delivery.
+---
 
-Core Goals
+## High-Level Architecture
 
-Real-time, low-latency audio processing suitable for guitar input
-
-Neural network–based amp head modeling
-
-Separate cabinet simulation via impulse response convolution
-
-Clean separation between audio host, DSP engine, and UI
-
-Standalone application first, plugin support later without rewriting DSP code
-
-Educational and exploratory focus without reliance on JUCE, NAM, or similar frameworks
-
-Key Features (Planned)
-Audio Engine
-
-Selectable audio backend:
-
-WASAPI (via NAudio)
-
-ASIO (via NAudio ASIO wrapper)
-
-Fixed internal processing block size with host buffer adaptation
-
-Lock-free, allocation-free audio callback
-
-CPU and dropout monitoring
-
-DSP Graph
-
-Modular block-based processing chain
-
-Deterministic real-time execution
-
-Parameter smoothing and automation support
-
-Expandable routing model
-
-Amp Modeling
-
-Neural amp head modeling using ONNX Runtime
-
-Causal, real-time safe architectures (e.g., TCN-style models)
-
-Optional oversampling for aliasing reduction
-
-Model state handling for dynamic behavior
-
-Cabinet Simulation
-
-Partitioned convolution IR engine
-
-Hot-swappable impulse responses with click-free transitions
-
-Stereo and mono IR support
-
-Capture Workflow
-
-Integrated excitation playback and response recording
-
-Metadata-rich capture sessions
-
-Exportable datasets for offline training
-
-Validation metrics (levels, noise floor, alignment)
-
-Non-Goals
-
-This project intentionally does not aim to:
-
-Compete immediately with commercial amp modelers
-
-Reimplement low-level OS audio drivers
-
-Provide DAW hosting features
-
-Ship preset packs or licensed models
-
-The focus is on engineering correctness and sound behavior, not rapid monetization.
-
-Architecture Overview
-UI
+```
+UI (WinUI 3)
  |
- |--> Audio Backend Selector (WASAPI / ASIO)
- |
-IAudioHost
- |
-Realtime Audio Engine
+AmpModeler.Engine
  |
 DSP Graph
- |--> Input Conditioning
- |--> Noise Gate
- |--> Neural Amp Model
- |--> Post EQ
- |--> Cab IR Convolution
- |--> Output Limiter
+ |--> Amp Model (ML)
+ |--> Cab IR (Convolution)
+ |
+IAudioHost (Abstractions)
+ |--> WASAPI Host
+ |--> ASIO Host
+```
 
+The DSP and engine layers are completely independent of the UI and audio backend, enabling reuse in future plugin or offline rendering scenarios.
 
-All DSP logic lives in a core library that is independent of the UI and audio backend, enabling future reuse in plugins or offline renderers.
+---
 
-Technology Stack
+## Solution Structure
 
-Language: C#
+```
+AmpModeler.sln
+ ├─ AmpModeler                (WinUI 3 Standalone App)
+ ├─ AmpModeler.Core           (Low-level DSP & realtime primitives)
+ ├─ AmpModeler.Engine         (Audio engine & DSP graph orchestration)
+ ├─ AmpModeler.Audio.Abstractions
+ ├─ AmpModeler.Audio.Wasapi
+ ├─ AmpModeler.Audio.Asio
+ ├─ AmpModeler.DspBlocks
+ ├─ AmpModeler.ML
+ └─ AmpModeler.Capture
+```
 
-Framework: .NET (latest LTS)
+Each project has a single, intentional responsibility.
 
-Audio I/O: NAudio (WASAPI + ASIO)
+---
 
-ML Runtime: Microsoft.ML.OnnxRuntime
+## Project Responsibilities
 
-Training: External (Python / PyTorch recommended)
+### AmpModeler (WinUI 3 App)
 
-Platform: Windows (initially)
+**Role:** Standalone application host
 
-Project Structure (Planned)
-/src
-  /Core
-    AudioEngine
-    DspGraph
-    Parameters
-    Utilities
-  /AudioHosts
-    WasapiHost
-    AsioHost
-  /DspBlocks
-    AmpModelBlock
-    CabConvolver
-    Filters
-    Dynamics
-  /Capture
-    Excitation
-    Recording
-    SessionMetadata
-  /UI
-    ViewModels
-    Views
-/docs
-/models
-/ir
+Responsibilities:
 
-Development Philosophy
+* Application lifecycle
+* Audio backend selection (WASAPI / ASIO)
+* Engine startup and shutdown
+* UI binding to parameters
+* Metering, controls, preset browsing
 
-No allocations in the audio thread
+Non-responsibilities:
 
-No locks in the audio thread
+* DSP logic
+* Audio thread code
+* Model inference logic
 
-Clear ownership of buffers and state
+This project should remain *thin*.
 
-Predictable CPU usage
+---
 
-Measure before optimizing
+### AmpModeler.Core
 
-Stability before sound quality
+**Role:** Realtime-safe foundations
 
-Sound quality before features
+Responsibilities:
 
-Roadmap (High-Level)
+* Audio buffer structures
+* DSP interfaces (`IAudioBlock`, etc.)
+* Parameter definitions and smoothing
+* Utility math and helpers
+* Realtime safety rules
 
-Stable real-time audio engine (WASAPI)
+Design constraints:
 
-DSP graph and parameter system
+* No UI dependencies
+* No audio I/O dependencies
+* No ML runtime dependencies
+* No allocations or locks in realtime paths
 
-IR convolution cab block
+This is the lowest-level layer and should remain minimal and stable.
 
-Capture tool MVP
+---
 
-Neural amp inference MVP
+### AmpModeler.Engine
 
-Oversampling and feel refinements
+**Role:** Audio engine and DSP graph orchestration
 
-ASIO backend
+Responsibilities:
 
-Plugin architecture exploration
+* Fixed-block audio processing
+* DSP block chaining and routing
+* Buffer adaptation between hosts and engine
+* Parameter propagation into DSP blocks
+* Engine state management
 
-Status
+This project owns **how audio flows**, but not **how audio is captured or displayed**.
 
-Early development. Expect breaking changes, incomplete features, and evolving architecture.
+---
 
-License
+### AmpModeler.Audio.Abstractions
 
-License to be determined. This repository is currently intended for research, learning, and experimentation.
+**Role:** Audio host interface definitions
 
-Disclaimer
+Responsibilities:
 
-This project is experimental and intended for educational and research purposes. Use at your own risk. No warranties are provided.
+* `IAudioHost`
+* Audio device settings and descriptors
+* Backend-agnostic audio callback contracts
+
+This layer allows:
+
+* WASAPI and ASIO to be interchangeable
+* Future plugin or offline hosts
+* Testing with mock hosts
+
+---
+
+### AmpModeler.Audio.Wasapi
+
+**Role:** Windows WASAPI implementation
+
+Responsibilities:
+
+* WASAPI exclusive/shared mode setup
+* Device enumeration
+* Buffer marshaling into engine format
+
+Dependencies:
+
+* NAudio
+* Audio.Abstractions
+* Core
+
+---
+
+### AmpModeler.Audio.Asio
+
+**Role:** ASIO implementation
+
+Responsibilities:
+
+* ASIO driver enumeration
+* Low-latency buffer handling
+* Driver-specific edge case handling
+
+Dependencies:
+
+* NAudio (ASIO wrapper)
+* Audio.Abstractions
+* Core
+
+This project is intentionally isolated due to driver variability.
+
+---
+
+### AmpModeler.DspBlocks
+
+**Role:** DSP processing modules
+
+Responsibilities:
+
+* Cabinet IR convolution
+* Filters and EQ
+* Dynamics (gate, limiter)
+* Oversampling utilities
+* Future non-ML amp stages if needed
+
+This project contains **signal processing math**, not engine control logic.
+
+---
+
+### AmpModeler.ML
+
+**Role:** Neural amp model inference
+
+Responsibilities:
+
+* ONNX Runtime integration
+* Amp model loading
+* Inference execution
+* Model state handling
+
+Training is intentionally performed **outside** the application and models are imported via ONNX.
+
+This separation allows experimentation with different architectures without destabilizing the engine.
+
+---
+
+### AmpModeler.Capture
+
+**Role:** Capture and dataset generation
+
+Responsibilities:
+
+* Excitation signal generation
+* Playback/record capture sessions
+* WAV file output
+* Metadata serialization
+* Capture validation metrics
+
+This project supports repeatable, high-quality dataset creation for offline training.
+
+---
+
+## Design Principles
+
+* No allocations in the audio thread
+* No locks in the audio thread
+* Fixed internal block size
+* Clear ownership of buffers
+* UI never touches realtime data directly
+* Stability before sound quality
+* Sound quality before features
+
+---
+
+## Roadmap (High-Level)
+
+1. Stable WASAPI audio engine
+2. DSP graph and parameter system
+3. IR convolution cab block
+4. Capture tool MVP
+5. Neural amp model inference MVP
+6. Oversampling and feel refinement
+7. ASIO backend hardening
+8. Plugin architecture exploration (VST3/AU)
+
+---
+
+## Status
+
+Early development. Architecture is intentionally over-designed early to avoid rewrites later.
+
+---
+
+## Disclaimer
+
+This project is experimental and intended for research and learning. No guarantees of fitness for production use are provided.
+
+---
+
+## License
+
+To be determined.
