@@ -41,6 +41,13 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260101001" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AmpModeler.Core\AmpModeler.Core.csproj" />
+    <ProjectReference Include="..\AmpModeler.Engine\AmpModeler.Engine.csproj" />
+    <ProjectReference Include="..\AmpModeler.Audio.Abstractions\AmpModeler.Audio.Abstractions.csproj" />
+    <ProjectReference Include="..\AmpModeler.Audio.Wasapi\AmpModeler.Audio.Wasapi.csproj" />
+  </ItemGroup>
+
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
     Explorer "Package and Publish" context menu entry to be enabled for this project even if

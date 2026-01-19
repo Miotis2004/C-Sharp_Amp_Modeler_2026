@@ -23,9 +23,18 @@ namespace Amp_Modeler_2026
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        public ViewModels.MainViewModel ViewModel { get; }
+
         public MainWindow()
         {
             InitializeComponent();
+            ViewModel = new ViewModels.MainViewModel();
+            // WinUI 3 doesn't automatically inherit DataContext to the Window content in the same way as WPF sometimes implies,
+            // but setting it on the Root element (Grid usually) is safest, or via x:Bind to {x:Bind ViewModel}.
+            // For simple binding:
+            ((FrameworkElement)Content).DataContext = ViewModel;
+
+            this.Closed += (s, e) => ViewModel.Dispose();
         }
     }
 }
