@@ -237,20 +237,29 @@ This project supports repeatable, high-quality dataset creation for offline trai
 
 ## Roadmap (High-Level)
 
-1. Stable WASAPI audio engine
-2. DSP graph and parameter system
-3. IR convolution cab block
-4. Capture tool MVP
-5. Neural amp model inference MVP
-6. Oversampling and feel refinement
-7. ASIO backend hardening
-8. Plugin architecture exploration (VST3/AU)
+- [x] Stable WASAPI audio engine (Core, Engine, Host implementations complete)
+- [x] UI Device Selection & Start/Stop (MVVM Integration)
+- [ ] DSP graph and parameter system
+- [ ] IR convolution cab block
+- [ ] Capture tool MVP
+- [ ] Neural amp model inference MVP
+- [ ] Oversampling and feel refinement
+- [ ] ASIO backend hardening
+- [ ] Plugin architecture exploration (VST3/AU)
 
 ---
 
 ## Status
 
-Early development. Architecture is intentionally over-designed early to avoid rewrites later.
+**Active Development**.
+
+The foundational layers are complete:
+*   **Core:** Zero-allocation audio buffers and processing interfaces.
+*   **Engine:** Fixed-block adaptation logic (ring buffers) and orchestration.
+*   **Audio Backend:** Low-latency WASAPI Shared Mode implementation (allocation-free hot path).
+*   **UI:** Basic WinUI 3 interface with MVVM architecture for device selection and engine control.
+
+Current focus: DSP Graph implementation.
 
 ---
 
