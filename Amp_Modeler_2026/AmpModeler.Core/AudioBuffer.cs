@@ -33,6 +33,17 @@ namespace AmpModeler.Core
         }
 
         /// <summary>
+        /// Creates an AudioBuffer wrapper around existing arrays.
+        /// Use with caution: The caller retains ownership of the arrays.
+        /// </summary>
+        public AudioBuffer(float[][] channels, int length)
+        {
+            _channels = channels ?? throw new ArgumentNullException(nameof(channels));
+            Length = length;
+            // Verify dimensions if needed, but keeping it fast.
+        }
+
+        /// <summary>
         /// Gets a span representing the samples for a specific channel.
         /// </summary>
         public Span<float> GetChannel(int channelIndex)
