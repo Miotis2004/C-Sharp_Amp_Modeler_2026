@@ -14,6 +14,31 @@
     </Window.SystemBackdrop>
 
     <Grid>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+            <TextBlock Text="AmpModeler 2026" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center"/>
 
+            <StackPanel Spacing="10">
+                <TextBlock Text="Input Device:"/>
+                <ComboBox ItemsSource="{Binding InputDevices}"
+                          SelectedItem="{Binding SelectedInput, Mode=TwoWay}"
+                          MinWidth="300"
+                          DisplayMemberPath="Name"/>
+            </StackPanel>
+
+            <StackPanel Spacing="10">
+                <TextBlock Text="Output Device:"/>
+                <ComboBox ItemsSource="{Binding OutputDevices}"
+                          SelectedItem="{Binding SelectedOutput, Mode=TwoWay}"
+                          MinWidth="300"
+                          DisplayMemberPath="Name"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center">
+                <Button Content="Start Audio" Command="{Binding StartCommand}" Style="{StaticResource AccentButtonStyle}"/>
+                <Button Content="Stop Audio" Command="{Binding StopCommand}"/>
+            </StackPanel>
+
+            <TextBlock Text="{Binding StatusMessage}" HorizontalAlignment="Center" Foreground="Gray"/>
+        </StackPanel>
     </Grid>
 </Window>
